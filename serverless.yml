@@ -11,7 +11,7 @@
 #
 # Happy Coding!
 
-service: lampda-services
+service: lambda-services
 # app and org for use with dashboard.serverless.com
 #app: your-app-name
 #org: your-org-name
@@ -23,26 +23,27 @@ service: lampda-services
 provider:
   name: aws
   runtime: nodejs12.x
+  region: ap-south-1
 
 # you can overwrite defaults here
-#  stage: dev
-#  region: us-east-1
+# stage: dev
+# region: ap-south-1
 
 # you can add statements to the Lambda function's IAM Role here
-#  iamRoleStatements:
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:ListBucket"
-#      Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
-#    - Effect: "Allow"
-#      Action:
-#        - "s3:PutObject"
-#      Resource:
-#        Fn::Join:
-#          - ""
-#          - - "arn:aws:s3:::"
-#            - "Ref" : "ServerlessDeploymentBucket"
-#            - "/*"
+iamRoleStatements:
+  - Effect: "Allow"
+    Action:
+      - "s3:*"
+  #    Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
+  #  - Effect: "Allow"
+  #    Action:
+  #      - "s3:PutObject"
+  #    Resource:
+  #      Fn::Join:
+  #        - ""
+  #        - - "arn:aws:s3:::"
+  #          - "Ref" : "ServerlessDeploymentBucket"
+  #          - "/*"
 
 # you can define service wide environment variables here
 #  environment:
@@ -66,10 +67,11 @@ functions:
 #    The following are a few example events you can configure
 #    NOTE: Please make sure to change your handler code to work with those events
 #    Check the event documentation for details
-    # events:
-    #  - http:
-    #      path: users/first
-    #      method: get
+    events:
+     - http:
+         path: users/first
+         method: get
+         cors: true
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
 #      - schedule: rate(10 minutes)
@@ -93,7 +95,7 @@ functions:
 #          pool: MyUserPool
 #          trigger: PreSignUp
 #      - alb:
-#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
+#          listenerArn: arn:aws:elasticloadbalancing:ap-south-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
 #          priority: 1
 #          conditions:
 #            host: example.com
@@ -104,12 +106,26 @@ functions:
 #      variable2: value2
 
 # you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
+resources:
+  Resources:
+    UploadResource:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:service}-${self:provider.stage}-bucket
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:service}-${self:provider.stage}-user
+        AttributeDefinitions:
+          - AttributeName: userId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: userId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+          
 #  Outputs:
 #     NewOutput:
 #       Description: "Description for the output"
