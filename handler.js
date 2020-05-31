@@ -2,6 +2,9 @@
 
 const uuid = require('node-uuid')
 const dbOp = require('./dboperation/dbmanager')
+const jwt = require('jsonwebtoken');
+const keys = require('./config/keys');
+const passport = require('passport');
 
 const response = {
   statusCode: 200,
@@ -166,3 +169,63 @@ module.exports.deleteUser = (event, content, callback) => {
       return callback(null, response)
    })
 };
+
+module.exports.login = (event, content, callback) => {
+  const data = JSON.parse(event.body)
+  // console.log('event ', data)
+  const userId = data.userId;
+  const password = data.Password;
+
+  const table = 'lambda-services-dev-user'
+  var params = {
+    TableName:table,
+    Key:{
+        "userId": userId,
+      }
+    };
+    let res
+  dbOp.getUser(params)
+   .then(data => {
+     console.log('recieved data \n',data)
+      res = JSON.stringify(data)  
+      console.log('Password ', password )  
+      console.log('Response ', data.Item.Email, data.Item.Password )  
+      // return callback(null, '')
+      
+      // Password match check
+      if(password === data.Item.Password){
+        const payload = { userId: data.Item.userId, email: data.Item.Email, FirstName: data.Item.FirstName, LastName: data.Item.LastName, Password: data.Item.Password  }; // Create JWT Payload
+        console.log('Payload ', payload)
+  
+        // Sign Token
+        jwt.sign(
+          payload,
+          keys.secretOrKey,
+          { expiresIn: 3600 },
+          (err, token) => { 
+            return callback(null,JSON.stringify({
+              success: true,
+              token: 'Bearer ' + token
+            }))
+            // console.log("decoded ", jwt_decode(token))
+          }
+        );
+      } else {
+        let errors = 'Password incorrect';
+        return errors;
+      }
+   })
+}
+
+module.exports.auth = (event, content, callback) => {
+  passport.authenticate('jwt', { session: false }),
+  (req, res) => {
+    return callback(null, JSON.stringify({
+      userId: data.Item.userId, 
+      email: data.Item.Email, 
+      FirstName: data.Item.FirstName, 
+      LastName: data.Item.LastName, 
+      Password: data.Item.Password
+    }))
+  }
+}

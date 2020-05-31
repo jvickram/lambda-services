@@ -74,6 +74,16 @@ functions:
   hello:
     handler: handler.hello
   
+  auth:
+    handler: auth
+    
+  login:
+    handler: handler.login
+    events:
+      - http:
+          path: login
+          method: post
+
   getUser:
     handler: handler.getUser
     events:
