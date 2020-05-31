@@ -1,5 +1,5 @@
 {
     "PREFIX": "DEV.",
-    "ROLE": "arn:aws:iam::387654305673:role/lambda-role",
+    "ROLE": "arn:aws:iam::387654305673:role/centralemailapirole",
     "AUTHORIZER":"arn:aws:lambda:eu-west-1:119000940251:function:advl-lfh-jwt-auth-lambda-v1"
 }

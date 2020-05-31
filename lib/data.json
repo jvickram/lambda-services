@@ -1,6 +1,6 @@
 {
     "pathParameters": {
-        "uid": "97897a-41cb-434c-a77e-5ea4a76abe8c"
+        "uid": "14e90c24-d230-40d5-88f0-823e52c1dd48"
     },
-    "body": "{\"userId\": \"97897a-41cb-434c-a77e-5ea4a76abe8c\",\"Email\": \"imran@gmail.com\",\"FirstName\": \"Imran\",\"LastName\": \"Khan\",\"Password\": \"imran1918\"}"
+    "body": "{\"userId\": \"14e90c24-d230-40d5-88f0-823e52c1dd48\",\"Email\": \"wasimhussain1994@gmail.com\",\"FirstName\": \"Aaryan\",\"LastName\": \"Hussain\",\"Password\": \"Aaryan1918\"}"
 }

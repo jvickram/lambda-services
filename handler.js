@@ -87,7 +87,7 @@ module.exports.addUser = (event, content, callback) => {
   // return { message: 'Go Serverless v1.0! Your function executed successfully!', event };
 };
 
-module.exports.getUserData = (event, content, callback) => {
+module.exports.getUser = (event, content, callback) => {
   const data = JSON.parse(event.body)
   console.log('event ', event)
   const userId = event.pathParameters.uid
@@ -111,9 +111,9 @@ module.exports.getUserData = (event, content, callback) => {
    })
 };
 
-module.exports.updateUserData = (event, content, callback) => {
+module.exports.editUser = (event, content, callback) => {
   const data = JSON.parse(event.body)
-  const userId = event.pathParamerter.uid
+  const userId = event.pathParameters.uid
   // console.log('Parsed data ', data)
   const email = data.Email
   const firstName = data.FirstName

@@ -29,26 +29,21 @@ provider:
   runtime: nodejs12.x
   region: ap-south-1
   stage: ${opt:stage,'dev'}
-  Role: ${file(config/config.${self:provider.stage}.json):ROLE}
+  role: ${file(config/config.${self:provider.stage}.json):ROLE}
 
   environment:
     PREFIX: ${file(config/config.${self:provider.stage}.json):PREFIX} 
+    ROLE: ${file(config/config.${self:provider.stage}.json):ROLE}
+
 
 # you can add statements to the Lambda function's IAM Role here
-iamRoleStatements:
-  - Effect: "Allow"
-    Action:
-      - "s3:*"
-      - "dynamodb"
-      - "dynamodb:DescribeTable"
-      - "dynamodb:Query"
-      - "dynamodb:Scan"
-      - "dynamodb:GetItem"
-      - "dynamodb:PutItem"
-      - "dynamodb:UpdateItem"
-      - "dynamodb:DeleteItem"
-      - "lambda:InvokeFunction" # Added this like mentioned above
-    Resource: "arn:aws:dynamodb:ap-south-1:387654305673:table/lambda-services-dev-user"
+# iamRoleStatements:
+#   - Effect: "Allow"
+#     Action:
+#       - "s3:*"
+#       - "dynamodb:*"
+#       - "lambda:InvokeFunction" # Added this like mentioned above
+#     Resource: "arn:aws:dynamodb:ap-south-1:387654305673:table/lambda-services-dev-user"
       # - arn:aws:dynamodb:ap-south-1:*:*
       # - arn:aws:lambda:ap-south-1:*:* # Had to add this too
   #    Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
@@ -79,11 +74,11 @@ functions:
   hello:
     handler: handler.hello
   
-  getUserData:
-    handler: handler.getUserData
+  getUser:
+    handler: handler.getUser
     events:
      - http:
-        path: users/getuserdata/{uid}
+        path: users/{uid}
         method: get
         # authorizer: ${file(config/config.${self:provider.stage}.json):AUTHORIZER}
         cors: true
@@ -92,16 +87,16 @@ functions:
     handler: handler.deleteUser
     events:
      - http:
-        path: users/removeser/{uid}
+        path: users/remove/{uid}
         method: get
         # authorizer: ${file(config/config.${self:provider.stage}.json):AUTHORIZER}
         cors: true
 
-  updateUserData:
-    handler: handler.updateUserData
+  editUser:
+    handler: handler.editUser
     events:
      - http:
-         path: users/updateuserdata
+         path: users/edit/{uid}
          method: post
          cors: true
   
@@ -109,7 +104,7 @@ functions:
     handler: handler.addUser
     events:
      - http:
-         path: users/adduser
+         path: users/add
          method: post
          cors: true
 #      - websocket: $connect
