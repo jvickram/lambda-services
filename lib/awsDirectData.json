@@ -1,0 +1,7 @@
+{
+    "userId": {"S": "97897a-41cb-434c-a77e-5ea4a76abe8c"},
+    "Email": {"S": "prajna@gmail.com"},
+    "FirstName": {"S": "Prajna"},
+    "LastName": {"S": "N"},
+    "Password": {"S": "Prajna@27"}
+}

@@ -20,20 +20,37 @@ service: lambda-services
 # Check out our docs for more details
 # frameworkVersion: "=X.X.X"
 
+plugins:
+  - serverless-offline
+
+
 provider:
   name: aws
   runtime: nodejs12.x
   region: ap-south-1
+  stage: ${opt:stage,'dev'}
+  Role: ${file(config/config.${self:provider.stage}.json):ROLE}
 
-# you can overwrite defaults here
-# stage: dev
-# region: ap-south-1
+  environment:
+    PREFIX: ${file(config/config.${self:provider.stage}.json):PREFIX} 
 
 # you can add statements to the Lambda function's IAM Role here
 iamRoleStatements:
   - Effect: "Allow"
     Action:
       - "s3:*"
+      - "dynamodb"
+      - "dynamodb:DescribeTable"
+      - "dynamodb:Query"
+      - "dynamodb:Scan"
+      - "dynamodb:GetItem"
+      - "dynamodb:PutItem"
+      - "dynamodb:UpdateItem"
+      - "dynamodb:DeleteItem"
+      - "lambda:InvokeFunction" # Added this like mentioned above
+    Resource: "arn:aws:dynamodb:ap-south-1:387654305673:table/lambda-services-dev-user"
+      # - arn:aws:dynamodb:ap-south-1:*:*
+      # - arn:aws:lambda:ap-south-1:*:* # Had to add this too
   #    Resource: { "Fn::Join" : ["", ["arn:aws:s3:::", { "Ref" : "ServerlessDeploymentBucket" } ] ]  }
   #  - Effect: "Allow"
   #    Action:
@@ -61,16 +78,39 @@ iamRoleStatements:
 functions:
   hello:
     handler: handler.hello
-
-  firstFunction:
-    handler: handler.firstFunction
-#    The following are a few example events you can configure
-#    NOTE: Please make sure to change your handler code to work with those events
-#    Check the event documentation for details
+  
+  getUserData:
+    handler: handler.getUserData
     events:
      - http:
-         path: users/first
-         method: get
+        path: users/getuserdata/{uid}
+        method: get
+        # authorizer: ${file(config/config.${self:provider.stage}.json):AUTHORIZER}
+        cors: true
+
+  deleteUser:
+    handler: handler.deleteUser
+    events:
+     - http:
+        path: users/removeser/{uid}
+        method: get
+        # authorizer: ${file(config/config.${self:provider.stage}.json):AUTHORIZER}
+        cors: true
+
+  updateUserData:
+    handler: handler.updateUserData
+    events:
+     - http:
+         path: users/updateuserdata
+         method: post
+         cors: true
+  
+  addUser:
+    handler: handler.addUser
+    events:
+     - http:
+         path: users/adduser
+         method: post
          cors: true
 #      - websocket: $connect
 #      - s3: ${env:BUCKET}
